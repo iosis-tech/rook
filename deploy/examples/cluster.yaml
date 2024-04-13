@@ -145,7 +145,7 @@ spec:
     # This value should only be set when the cluster is about to be deleted. After the confirmation is set,
     # Rook will immediately stop configuring the cluster and only wait for the delete command.
     # If the empty string is set, Rook will not destroy any data on hosts during uninstall.
-    confirmation: "yes-really-destroy-data"
+    confirmation: ""
     # sanitizeDisks represents settings for sanitizing OSD disks on cluster deletion
     sanitizeDisks:
       # method indicates if the entire disk should be sanitized or simply ceph's metadata
@@ -246,8 +246,8 @@ spec:
     mgr: system-cluster-critical
     #crashcollector: rook-ceph-crashcollector-priority-class
   storage: # cluster level storage configuration and selection
-    useAllNodes: true
-    useAllDevices: true
+    useAllNodes: false
+    useAllDevices: false
     #deviceFilter:
     config:
       # crushRoot: "custom-root" # specify a non-default root label for the CRUSH map
@@ -257,17 +257,22 @@ spec:
       # encryptedDevice: "true" # the default value for this option is "false"
     # Individual nodes and their config can be specified as well, but 'useAllNodes' above must be set to false. Then, only the named
     # nodes below will be used as storage resources.  Each node's 'name' field should match their 'kubernetes.io/hostname' label.
-    # nodes:
-    #   - name: "172.17.4.201"
-    #     devices: # specific devices to use for storage can be specified for each node
-    #       - name: "sdb"
-    #       - name: "nvme01" # multiple osds can be created on high performance devices
-    #         config:
-    #           osdsPerDevice: "5"
-    #       - name: "/dev/disk/by-id/ata-ST4000DM004-XXXX" # devices can be specified using full udev paths
-    #     config: # configuration can be specified at the node level which overrides the cluster level config
-    #   - name: "172.17.4.301"
-    #     deviceFilter: "^sd."
+    nodes:
+      - name: "node1"
+        devices: # specific devices to use for storage can be specified for each node
+          - name: "/dev/cephvg1/cephdata1"
+            config:
+              deviceClass: hdd
+      - name: "node2"
+        devices: # specific devices to use for storage can be specified for each node
+          - name: "/dev/cephvg1/cephdata1"
+            config:
+              deviceClass: hdd
+      - name: "node3"
+        devices: # specific devices to use for storage can be specified for each node
+          - name: "/dev/cephvg1/cephdata1"
+            config:
+              deviceClass: hdd
     # when onlyApplyOSDPlacement is false, will merge both placement.All() and placement.osd
     onlyApplyOSDPlacement: false
     # Time for which an OSD pod will sleep before restarting, if it stopped due to flapping
